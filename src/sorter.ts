@@ -1,63 +1,67 @@
-import { NavPluginSettings } from "main";
+import { SettingPairs } from "settings";
 import { View, TFolder, TFile, FolderItem } from "obsidian";
+import SettingsUtils from "settingsUtils";
 
-export class Sorter {
+export default class Sorter {
 
     private static fileWeightsByFolder: Record<string, Record<string, number>>
     private static fileExpView: View
-    private static settings: NavPluginSettings
+    private static settings: SettingPairs
 
-    static init(fileExpView: View, settings: NavPluginSettings) {
+    static startSorting(fileExpView: View, settings: SettingPairs) {
         this.fileExpView = fileExpView
         this.settings = settings
+
+        this.sort()
     }
 
     // modified from js source code
-    static startSorting() {
-        if (this.fileExpView.ready)
-            if (this.fileExpView.containerEl.isShown()) {
-                const vault = this.fileExpView.app.vault
+    private static sort() {
 
-                // source code from js
-                const items = this.fileExpView.fileItems
-                const tree = this.fileExpView.tree
-                const navContainer = this.fileExpView.navFileContainerEl
-                const scrollTop = navContainer.scrollTop
+        if (!this.fileExpView.ready || this.fileExpView.containerEl.isShown()) return
 
-                // init all folder
-                this.fileWeightsByFolder = {}
-                this.fileWeightsByFolder[vault.getRoot().path] = {}
-                const folderItemArr: FolderItem[] = []
-                for (const k in items) {
-                    const folderItemOr = items[k]
-                    const folderOr = folderItemOr.file
-                    // expect folder
-                    if (!(items.hasOwnProperty(k) && folderOr && (folderOr instanceof TFolder))) continue;
+        const vault = this.fileExpView.app.vault
 
-                    folderItemArr.push(folderItemOr as FolderItem)
-                    this.fileWeightsByFolder[folderOr.path] = {}
-                }
+        // source code from js
+        const items = this.fileExpView.fileItems
+        const tree = this.fileExpView.tree
+        const navContainer = this.fileExpView.navFileContainerEl
+        const scrollTop = navContainer.scrollTop
 
-                // gen all weights
-                this.genWeightsByPath(vault.getRoot())
-                for (const folderItem of folderItemArr) {
-                    // definitely a folder
-                    this.genWeightsByPath(folderItem.file as TFolder)
-                }
+        // init all folder
+        this.fileWeightsByFolder = {}
+        this.fileWeightsByFolder[vault.getRoot().path] = {}
+        const folderItemArr: FolderItem[] = []
+        for (const k in items) {
+            const folderItemOr = items[k]
+            const folderOr = folderItemOr.file
+            // expect folder
+            if (!(items.hasOwnProperty(k) && folderOr && (folderOr instanceof TFolder))) continue;
 
-                // sort all by weight
-                tree.infinityScroll.rootEl.vChildren.setChildren(this.getSortedFolderItems(vault.getRoot()))
-                for (const folderItem of folderItemArr) {
-                    folderItem.vChildren.setChildren(this.getSortedFolderItems(folderItem.file))
-                }
+            folderItemArr.push(folderItemOr as FolderItem)
+            this.fileWeightsByFolder[folderOr.path] = {}
+        }
+
+        // gen all weights
+        this.genWeightsByPath(vault.getRoot())
+        for (const folderItem of folderItemArr) {
+            // definitely a folder
+            this.genWeightsByPath(folderItem.file as TFolder)
+        }
+
+        // sort all by weight
+        tree.infinityScroll.rootEl.vChildren.setChildren(this.getSortedFolderItems(vault.getRoot()))
+        for (const folderItem of folderItemArr) {
+            folderItem.vChildren.setChildren(this.getSortedFolderItems(folderItem.file))
+        }
 
 
-                // debug
-                // console.log(this.fileWeightsByFolder)
+        // debug
+        // console.log(this.fileWeightsByFolder)
 
-                navContainer.scrollTop = scrollTop
-                tree.infinityScroll.compute()
-            }
+        navContainer.scrollTop = scrollTop
+        tree.infinityScroll.compute()
+
         // deleted !isShown source code, do nothing
     }
 
@@ -79,16 +83,16 @@ export class Sorter {
         // iterate files in folder
         for (const file of folder.children) {
             const weight = (() => {
-                if (file instanceof TFolder) return this.settings.defaultForFolder    // default for folder
+                if (file instanceof TFolder) return this.settings.weightForFolder    // default for folder
                 if (!(file instanceof TFile) || (file.extension !== 'md')) {  // not file or file not .md
-                    return this.settings.defaultForOtherFile
+                    return this.settings.weightForOtherFile
                 }
                 if (file.name === 'index.md') {           // index.md, set weight of folder in folder.parent
                     if (file.parent) {
                         // override default weight of folder
                         this.fileWeightsByFolder[file.parent.path][file.path] = this.getWeightOfMd(file)
                     }
-                    return this.settings.defaultForIndex
+                    return this.settings.weightForIndex
                 }
                 // normal .md
                 return this.getWeightOfMd(file)
@@ -103,15 +107,11 @@ export class Sorter {
         const cachedMetadata = this.fileExpView.app.metadataCache.getFileCache(file)
         // file with .md bu not markdown
         if (!cachedMetadata) {
-            return this.settings.defaultForOtherFile
+            return this.settings.weightForOtherFile
         }
         // get weight or default
-        const weight = cachedMetadata.frontmatter && cachedMetadata.frontmatter[this.settings.sortKey]
-        return parseFloat(weight) || this.settings.defaultForMarkdownFile
-
+        const weight = SettingsUtils.getNumberOrNull(cachedMetadata.frontmatter && cachedMetadata.frontmatter[this.settings.sortKey])
+        return weight ? weight : this.settings.weightForMarkdownFile
     }
-
-
-
 
 }

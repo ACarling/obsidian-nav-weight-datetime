@@ -18,7 +18,7 @@ export default class Sorter {
     // modified from js source code
     private static sort() {
 
-        if (!this.fileExpView.ready || this.fileExpView.containerEl.isShown()) return
+        if (!this.fileExpView.ready || !this.fileExpView.containerEl.isShown()) return
 
         const vault = this.fileExpView.app.vault
 

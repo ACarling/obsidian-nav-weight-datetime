@@ -29,8 +29,8 @@ export default class NavWeightPlugin extends Plugin {
 			ribbonIconEl.addClass('nav-weight-ribbon-class');
 
 			// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-			const statusBarItemEl = this.addStatusBarItem();
-			statusBarItemEl.setText('Nav Weight ✅');
+			// const statusBarItemEl = this.addStatusBarItem();
+			// statusBarItemEl.setText('Nav Weight ✅');
 			// statusBarItemEl.
 
 			// This adds a settings tab so the user can configure various aspects of the plugin

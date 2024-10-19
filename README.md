@@ -6,9 +6,9 @@ This plugin sorts files by recognizing the `weight` key defined in the markdown 
 
 While there are several plugins available that offer customization of navigation, I created this particular plugin because others tend to be overly complex for a lazy person like me.
 
-# Usage
+## Usage
 
-## Step 1
+### Step 1
 
 define some `weight`s in your markdown files, like:
 ``` markdown
@@ -17,8 +17,12 @@ weight: 1
 ---
 ```
 
-# Step 2
+### Step 2
 
 click the ![](./arrow-down-narrow-wide.svg) icon in the left ribbon.
 
-**done!**
+**Done!**
+
+---
+> [!TIP]
+> If you are using [mkdocs](https://www.mkdocs.org/), you can find the similar plugin at [here](https://github.com/shu307/mkdocs-nav-weight) .

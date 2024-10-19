@@ -19,6 +19,6 @@ weight: 1
 
 # Step 2
 
-click the ![](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWRvd24tbmFycm93LXdpZGUiPjxwYXRoIGQ9Im0zIDE2IDQgNCA0LTQiLz48cGF0aCBkPSJNNyAyMFY0Ii8+PHBhdGggZD0iTTExIDRoNCIvPjxwYXRoIGQ9Ik0xMSA4aDciLz48cGF0aCBkPSJNMTEgMTJoMTAiLz48L3N2Zz4=) icon in the left ribbon.
+click the ![](./arrow-down-narrow-wide.svg) icon in the left ribbon.
 
 **done!**

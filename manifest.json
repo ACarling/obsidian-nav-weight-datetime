@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-nav-weight",
-	"name": "Nav weight",
+	"id": "nav-weight",
+	"name": "Nav Weight",
 	"version": "1.0.1",
 	"minAppVersion": "1.7.4",
 	"description": "Sort your navigation items by markdown frontmatter.",

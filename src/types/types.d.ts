@@ -1,8 +1,7 @@
 import 'obsidian';
 
 declare module 'obsidian' {
-  // derive from View, treat as View
-  interface View {
+  interface FileExplorerView extends View{
     ready: boolean;
     fileItems: Record<string, Item>;
     tree: {

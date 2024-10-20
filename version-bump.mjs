@@ -1,22 +1,9 @@
 import { readFileSync, writeFileSync } from "fs";
 
-// increase version when releasing
-// reading from package.json
-const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
-const oldVersion = packageJson.version;
-const versionParts = oldVersion.split('.');
-versionParts[2] = (parseInt(versionParts[2]) + 1).toString();
-const newVersion = versionParts.join('.');
-packageJson.version = newVersion;
-writeFileSync('./package.json', JSON.stringify(packageJson, null, "\t"));
-console.log(`Bumped version from ${oldVersion} to ${newVersion}`);
+// If preversion, version, or postversion are in the scripts property of the package.json
+// they will be executed as part of running npm version.
 
-// update draft-release.ps1 with new version
-const ps1Filename = "draft-release.ps1";
-const ps1FileContent = `git tag -a ${newVersion} -m "${newVersion}"\r\ngit push origin ${newVersion}\r\nWrite-Host "Completed. The GitHub Action will automatically draft a release."`
-writeFileSync(ps1Filename, ps1FileContent);
-console.log(`Updated ${ps1Filename} with new version ${newVersion}`);
-console.log(`!NOTE: make sure all changes are committed before running ${ps1Filename}`)
+const newVersion = process.env.npm_package_version;
 
 // read minAppVersion from manifest.json and bump version to target version
 let manifest = JSON.parse(readFileSync("manifest.json", "utf8"));

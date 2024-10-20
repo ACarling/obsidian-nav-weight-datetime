@@ -11,7 +11,10 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
-    "outDir": "./dist",
+    "outDir": ".",
+    "declaration": true,
+    "declarationDir": "./types",
+    "declarationMap": true,
     "lib": [
       "DOM",
       "ES5",
@@ -20,11 +23,10 @@
     ]
   },
   "include": [
-    "src",
-    "types"
+    "src/**/*",
   ],
   "exclude": [
     "node_modules",
-    "dist"
-  ]
+    "main.js"
+  ],
 }

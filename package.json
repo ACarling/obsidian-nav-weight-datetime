@@ -7,7 +7,7 @@
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs",
-		"release": "tsc -noEmit -skipLibCheck && node version-bump.mjs && node esbuild.config.mjs production"
+		"dec": "tsc -d --skipLibCheck"
 	},
 	"keywords": [],
 	"author": "shu307",

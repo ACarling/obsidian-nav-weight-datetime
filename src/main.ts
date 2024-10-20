@@ -1,13 +1,12 @@
-import { Plugin } from 'obsidian';
-import { SettingPairs, NavWeightSettingTab } from 'settings';
+import { FileExplorerView, Plugin } from 'obsidian';
+import { NavWeightSettingTab } from "settingTab";
 import Sorter from 'sorter';
-import SettingsUtils from 'settingsUtils';
-// Remember to rename these classes and interfaces!
+import SettingsUtils from 'settingUtils';
+import { NaveightSettings } from 'setting';
 
 
-
-export default class NavWeightPlugin extends Plugin {
-	settings: SettingPairs;
+export default class NaveightPlugin extends Plugin {
+	userSettings: NaveightSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -18,11 +17,11 @@ export default class NavWeightPlugin extends Plugin {
 
 				// 🖕 fuck obsidian 
 				// its n.view.getViewType(), not n.type
-				const fileExpLeaves = this.app.workspace.getLeavesOfType("file-explorer");
-				const fileExpLeaf = fileExpLeaves[0];
-				if (!fileExpLeaf) return;
+				const leaves = this.app.workspace.getLeavesOfType("file-explorer");
+				const leaf = leaves[0];
+				if (!leaf) return;
 
-				Sorter.startSorting(fileExpLeaf.view, this.settings)
+				Sorter.startSorting(leaf.view as FileExplorerView, this.userSettings)
 
 			});
 			// Perform additional things with the ribbon
@@ -42,11 +41,11 @@ export default class NavWeightPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = SettingsUtils.verifyData(await this.loadData());
+		this.userSettings = SettingsUtils.verifyData(await this.loadData());
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings);
+		await this.saveData(this.userSettings);
 	}
 }
 

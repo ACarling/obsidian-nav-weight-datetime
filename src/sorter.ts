@@ -1,16 +1,17 @@
-import { SettingPairs } from "settings";
-import { View, TFolder, TFile, FolderItem, CachedMetadata } from "obsidian";
-import SettingsUtils from "settingsUtils";
+import { FileExplorerView, TFolder, TFile, FolderItem, CachedMetadata } from "obsidian";
+import { NaveightSettings } from "setting";
+import SettingsUtils from "settingUtils";
+
 
 export default class Sorter {
 
     private static fileWeightsByFolder: Record<string, Record<string, number>>
-    private static fileExpView: View
-    private static settings: SettingPairs
+    private static fileExpView: FileExplorerView
+    private static userSettings: NaveightSettings
 
-    static startSorting(fileExpView: View, settings: SettingPairs) {
+    static startSorting(fileExpView: FileExplorerView, userSettings: NaveightSettings) {
         this.fileExpView = fileExpView
-        this.settings = settings
+        this.userSettings = userSettings
 
         this.sort()
     }
@@ -23,7 +24,7 @@ export default class Sorter {
         const vault = this.fileExpView.app.vault
 
         // source code from js
-        const items = this.fileExpView.fileItems
+        const itemMap = this.fileExpView.fileItems
         const tree = this.fileExpView.tree
         const navContainer = this.fileExpView.navFileContainerEl
         const scrollTop = navContainer.scrollTop
@@ -32,13 +33,13 @@ export default class Sorter {
         this.fileWeightsByFolder = {}
         this.fileWeightsByFolder[vault.getRoot().path] = {}
         const folderItemArr: FolderItem[] = []
-        for (const k in items) {
-            const folderItemOr = items[k]
-            const folderOr = folderItemOr.file
+        for (const k in itemMap) {
+            const item = itemMap[k]
+            const folderOr = item.file
             // expect folder
-            if (!(items.hasOwnProperty(k) && folderOr && (folderOr instanceof TFolder))) continue;
+            if (!(itemMap.hasOwnProperty(k) && folderOr && (folderOr instanceof TFolder))) continue;
 
-            folderItemArr.push(folderItemOr as FolderItem)
+            folderItemArr.push(item as FolderItem)
             this.fileWeightsByFolder[folderOr.path] = {}
         }
 
@@ -83,16 +84,16 @@ export default class Sorter {
         // iterate files in folder
         for (const file of folder.children) {
             const weight = (() => {
-                if (file instanceof TFolder) return this.settings.weightForFolder    // default for folder
+                if (file instanceof TFolder) return this.userSettings.weightForFolder    // default for folder
                 if (!(file instanceof TFile) || (file.extension !== 'md')) {  // not file or file not .md
-                    return this.settings.weightForOtherFile
+                    return this.userSettings.weightForOtherFile
                 }
                 if (file.name === 'index.md') {           // index.md, set weight of folder in folder.parent
                     if (file.parent) {
                         // override default weight of folder
                         this.fileWeightsByFolder[file.parent.path][file.path] = this.getWeightOfMd(file)
                     }
-                    return this.settings.weightForIndex
+                    return this.userSettings.weightForIndex
                 }
                 // normal .md
                 return this.getWeightOfMd(file)
@@ -103,17 +104,17 @@ export default class Sorter {
         }
     }
 
-    private static getWeightOfMd(file: TFile) {
+    private static getWeightOfMd(mdFile: TFile) {
 
         // any file with extension ".md" own its cachedMetadata, even it's not a markdown file !!!
         // empty markdown: cachedMetadata = {} ( {} = true )
 
-        const cachedMetadata = this.fileExpView.app.metadataCache.getFileCache(file) as CachedMetadata
+        const cachedMetadata = this.fileExpView.app.metadataCache.getFileCache(mdFile) as CachedMetadata
         const frontmatter = cachedMetadata.frontmatter
         if (!frontmatter)
-            return this.settings.weightForMarkdownFile
+            return this.userSettings.weightForMarkdownFile
 
-        const rawWeight = frontmatter[this.settings.sortKey]
+        const rawWeight = frontmatter[this.userSettings.sortKey]
         return SettingsUtils.getInputOrDflt(String(rawWeight), 'weightForMarkdownFile') as number
 
     }

@@ -4,7 +4,7 @@
 	"version": "1.0.4",
 	"minAppVersion": "1.7.4",
 	"description": "Sort your navigation items by markdown frontmatter.",
-	"author": "Obsidian",
+	"author": "shu307",
 	"authorUrl": "https://github.com/shu307",
 	"isDesktopOnly": true
 }

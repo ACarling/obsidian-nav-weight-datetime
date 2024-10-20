@@ -1,7 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
-import { copyFile } from "fs";
+import { copyFileSync } from "fs";
 
 const banner =
 	`/*
@@ -44,7 +44,7 @@ const context = await esbuild.context({
 
 if (prod) {
 	await context.rebuild();
-	copyFile("./manifest.json", "./dist/manifest.json", () => { })
+	copyFileSync("./manifest.json", "./dist/manifest.json")
 	process.exit(0);
 } else {
 	await context.watch();

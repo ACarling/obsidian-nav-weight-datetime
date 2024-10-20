@@ -1,5 +1,5 @@
 import { SettingPairs } from "settings";
-import { View, TFolder, TFile, FolderItem } from "obsidian";
+import { View, TFolder, TFile, FolderItem, CachedMetadata } from "obsidian";
 import SettingsUtils from "settingsUtils";
 
 export default class Sorter {
@@ -104,14 +104,18 @@ export default class Sorter {
     }
 
     private static getWeightOfMd(file: TFile) {
-        const cachedMetadata = this.fileExpView.app.metadataCache.getFileCache(file)
-        // file with .md bu not markdown
-        if (!cachedMetadata) {
-            return this.settings.weightForOtherFile
-        }
-        // get weight or default
-        const weight = SettingsUtils.getNumberOrNull(cachedMetadata.frontmatter && cachedMetadata.frontmatter[this.settings.sortKey])
-        return weight ? weight : this.settings.weightForMarkdownFile
+
+        // any file with extension ".md" own its cachedMetadata, even it's not a markdown file !!!
+        // empty markdown: cachedMetadata = {} ( {} = true )
+
+        const cachedMetadata = this.fileExpView.app.metadataCache.getFileCache(file) as CachedMetadata
+        const frontmatter = cachedMetadata.frontmatter
+        if (!frontmatter)
+            return this.settings.weightForMarkdownFile
+
+        const rawWeight = frontmatter[this.settings.sortKey]
+        return SettingsUtils.getInputOrDflt(String(rawWeight), 'weightForMarkdownFile') as number
+
     }
 
 }

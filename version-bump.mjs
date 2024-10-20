@@ -11,11 +11,12 @@ packageJson.version = newVersion;
 writeFileSync('./package.json', JSON.stringify(packageJson, null, "\t"));
 console.log(`Bumped version from ${oldVersion} to ${newVersion}`);
 
-// update release-draft.ps1 with new version
-const releaseDraft = `git tag -a ${newVersion} -m "${newVersion}"\r\ngit push origin ${newVersion}`
-writeFileSync("release_draft.ps1", releaseDraft);
-console.log(`Updated release_draft.ps1 with new version ${newVersion}`);
-console.log('!NOTE: make sure all changes are committed before running release_draft.ps1')
+// update draft-release.ps1 with new version
+const ps1Filename = "draft-release.ps1";
+const ps1FileContent = `git tag -a ${newVersion} -m "${newVersion}"\r\ngit push origin ${newVersion}\r\nWrite-Host "Completed. The GitHub Action will automatically draft a release."`
+writeFileSync(ps1Filename, ps1FileContent);
+console.log(`Updated ${ps1Filename} with new version ${newVersion}`);
+console.log(`!NOTE: make sure all changes are committed before running ${ps1Filename}`)
 
 // read minAppVersion from manifest.json and bump version to target version
 let manifest = JSON.parse(readFileSync("manifest.json", "utf8"));

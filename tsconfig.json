@@ -11,9 +11,9 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
-    "outDir": ".",
+    "outDir": "./dist",
     "declaration": true,
-    "declarationDir": "./types",
+    "declarationDir": "./src/types",
     "declarationMap": true,
     "lib": [
       "DOM",
@@ -27,6 +27,5 @@
   ],
   "exclude": [
     "node_modules",
-    "main.js"
   ],
 }

@@ -1,12 +1,12 @@
 import { FileExplorerView, Plugin } from 'obsidian';
-import { NavWeightSettingTab } from "settingTab";
+import { CfgNotSet, NwtCfg, RawData, DEFAULT_CONFIG as dfltConfig, } from 'setting';
+import { NaveightSettingTab } from "setting";
+import Utils from 'utils';
 import Sorter from 'sorter';
-import SettingsUtils from 'settingUtils';
-import { NaveightSettings } from 'setting';
 
 
 export default class NaveightPlugin extends Plugin {
-	userSettings: NaveightSettings;
+	userConfig: NwtCfg;
 
 	async onload() {
 		await this.loadSettings();
@@ -21,7 +21,8 @@ export default class NaveightPlugin extends Plugin {
 				const leaf = leaves[0];
 				if (!leaf) return;
 
-				Sorter.startSorting(leaf.view as FileExplorerView, this.userSettings)
+				const sorter = new Sorter(leaf.view as FileExplorerView, this.userConfig);
+				sorter.sort();
 
 			});
 			// Perform additional things with the ribbon
@@ -33,7 +34,7 @@ export default class NaveightPlugin extends Plugin {
 			// statusBarItemEl.
 
 			// This adds a settings tab so the user can configure various aspects of the plugin
-			this.addSettingTab(new NavWeightSettingTab(this.app, this));
+			this.addSettingTab(new NaveightSettingTab(this.app, this));
 		})
 	}
 
@@ -41,14 +42,36 @@ export default class NaveightPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.userSettings = SettingsUtils.verifyData(await this.loadData());
+		const loadedSettings = Object.assign({}, await this.loadData()) as Record<keyof NwtCfg, RawData>;
+		const tempConfig = {} as NwtCfg;
+
+
+		for (const key in dfltConfig) {
+			const k = key as keyof NwtCfg;
+
+			(tempConfig[k] as NwtCfg[keyof NwtCfg]) = Utils.getRawAsDataOrDflt(loadedSettings[k], dfltConfig[k]);
+		}
+
+		this.userConfig = tempConfig;
+
+		console.log('load', this.userConfig);
 	}
 
 	async saveSettings() {
-		await this.saveData(this.userSettings);
+		const excludedKey: keyof CfgNotSet = 'fbk_headless'
+		const savingSettings = {} as NwtCfg;
+
+		for (const key in dfltConfig) {
+			const k = key as keyof NwtCfg;
+			// ignore keys not setting
+			if (key === excludedKey) continue;
+
+			(savingSettings[k] as NwtCfg[keyof NwtCfg]) = this.userConfig[k];
+		}
+
+		await this.saveData(savingSettings);
 	}
 }
-
 
 
 

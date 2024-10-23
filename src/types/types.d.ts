@@ -1,9 +1,9 @@
 import 'obsidian';
 
 declare module 'obsidian' {
-  interface FileExplorerView extends View{
+  interface FileExplorerView extends View {
     ready: boolean;
-    fileItems: Record<string, Item>;
+    fileItems: Record<string, Item | undefined>;
     tree: {
       infinityScroll: {
         compute(): unknown;
@@ -15,6 +15,10 @@ declare module 'obsidian' {
 
   interface Item {
     file?: TAbstractFile
+    selfEl?: HTMLElement
+    vChildren?: {
+      setChildren(items: Item[]): unknown;
+    }
   }
 
   interface FolderItem extends Item {

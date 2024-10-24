@@ -1,7 +1,8 @@
 import NaveightPlugin from "main";
 import { Setting } from "obsidian";
-import { NwtCfg, RawData, DescOfSettings, DEFAULT_CONFIG as dfltConfig } from "setting";
+import { NwtCfg, RawData, DescOfSettings, DEFAULT_CONFIG as dfltConfig, CfgFmFbk } from "setting";
 import { DESC_OF_SETTINGS as settingsTexts } from "setting";
+import Sorter, { LogMsg } from "sorter";
 
 export default class Utils {
     private static getValidNumberOrNull(num: string): number | null {
@@ -37,25 +38,48 @@ export default class Utils {
     }
 
     // a setting data from setting tab, string. 
-    static getStringAsDataOrDflt(str: string, dflt: NwtCfg[keyof NwtCfg]) {
-        const data = this.getStringAsDataOrNull(str, typeof dflt)
-
-        return data === null ? dflt : data;
+    static getStringAsDataOrDflt<T extends CfgFmFbk[keyof CfgFmFbk] | NwtCfg[keyof NwtCfg]>(str: string, dflt: T, sorter?: Sorter, msg?: LogMsg) {
+        const data = this.getStringAsDataOrNull(str, typeof dflt);
+        if (data !== null) {
+            return data as T
+        }
+        this.tryCatchLogger(sorter, msg);
+        return dflt;
     }
 
+
     // a setting data loaded data.json/frontmatter, could be anything, so check type first.
-    static getRawAsDataOrDflt(raw: RawData, dflt: NwtCfg[keyof NwtCfg]) {
+    static getRawAsDataOrDflt<T extends CfgFmFbk[keyof CfgFmFbk] | NwtCfg[keyof NwtCfg]>(raw: RawData, dflt: T, sorter?: Sorter, msg?: LogMsg): T {
         const expectType = typeof dflt;
 
+        // console.log(raw, typeof raw);
         switch (typeof raw) {
             case 'string':
-                return this.getStringAsDataOrDflt(raw, dflt);
+                return this.getStringAsDataOrDflt(raw, dflt, sorter, msg);
             case 'number':
-                return (expectType === 'number' && Number.isFinite(raw)) ? raw : dflt;
-            case 'boolean':
-                return expectType === 'boolean' ? raw : dflt;
-            default:
+                if (expectType === 'number' && Number.isFinite(raw)) {
+                    return raw as T;
+                }
+                this.tryCatchLogger(sorter, msg);
                 return dflt;
+            case 'boolean':
+                if (expectType === 'boolean') {
+                    return raw as T;
+                }
+                this.tryCatchLogger(sorter, msg);
+                return dflt;
+            case 'undefined':
+                return dflt;
+            default:
+                this.tryCatchLogger(sorter, msg);
+                return dflt;
+        }
+    }
+
+
+    private static tryCatchLogger(sorter?: Sorter, msg?: LogMsg) {
+        if (sorter && msg) {
+            sorter.catchLogger(msg);
         }
     }
 
@@ -76,4 +100,6 @@ export default class Utils {
                     await plugin.saveSettings();
                 }));
     }
+
+
 }

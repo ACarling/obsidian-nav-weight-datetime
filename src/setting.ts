@@ -9,28 +9,20 @@ export interface CfgFmKey {
     key_retitled: string
 }
 
-export type CfgFmKeyIdx = Omit<CfgFmKey, 'key_headless_md'>
-export type CfgFmKeyMd = Omit<CfgFmKey, 'key_retitled' | 'key_headless_index'>
-export type CfgFmFbkIdx = Pick<CfgFmFbk, 'fbk_weight_folder' | 'fbk_headless' | 'fbk_retitled'>
-export type CfgFmFbkMd = Pick<CfgFmFbk, 'fbk_weight_md' | 'fbk_headless'>
-
-export interface CfgFmFbkWt {
+export interface CfgFmFbk {
     fbk_weight_folder: number
     fbk_weight_index: number
     fbk_weight_md: number
     fbk_weight_other: number
-}
-
-export interface CfgFmFbk extends CfgFmFbkWt {
     fbk_headless: boolean
     fbk_retitled: boolean
 }
 
-export type CfgNotSet = Pick<CfgFmFbk, 'fbk_headless'>
-
 export type RawData = NwtCfg[keyof NwtCfg] | null;
 
-export type NwtCfg = CfgFmKey & CfgFmFbk
+export interface NwtCfg extends CfgFmKey, CfgFmFbk {
+    filename_index: string
+}
 
 
 export const DEFAULT_CONFIG: NwtCfg = {
@@ -43,56 +35,47 @@ export const DEFAULT_CONFIG: NwtCfg = {
     fbk_weight_md: 0,
     fbk_weight_other: 10,
     fbk_headless: false,
-    fbk_retitled: false
+    fbk_retitled: false,
+    filename_index: 'index'
 }
 
-type NwtSet = keyof Omit<NwtCfg, 'fbk_headless'>
+type NwtSet = Pick<CfgFmKey, 'key_sort'> & Omit<NwtCfg, keyof CfgFmKey | 'fbk_headless'>
 interface Desc {
     name: string
     desc: string
 }
-export type DescOfSettings = Record<NwtSet, Desc>
+export type DescOfSettings = Record<keyof NwtSet, Desc>
 
 export const DESC_OF_SETTINGS: DescOfSettings = {
     key_sort: {
         name: 'Sort key',
-        desc: 'The key use to sort defined in frontmatter, eg: weight, order'
-    },
-    key_headless_index: {
-        name: 'Headless for index',
-        desc: 'Headless for index, such as index.md readme.md'
-    },
-    key_headless_md: {
-        name: 'Headless for markdown',
-        desc: 'Headless for markdown, such as index.md readme.md'
-    },
-    key_retitled: {
-        name: 'Retitled',
-        desc: 'Retitled file will be sorted by its title'
+        desc: 'The key defined in the frontmatter and use its value as a weight to sort the ".md" files, eg: "weight", "order"'
     },
     fbk_weight_folder: {
-        name: 'Default value for folder',
-        desc: 'Fallback for missing value, such as value undefined'
+        name: 'Default weight for folder',
+        desc: 'Fallback for folder, if it does not possess a child index, or the value in index is invalid. '
     },
     fbk_weight_index: {
-        name: 'Fixed value for index markdown file',
-        desc: 'Fixed value for index, such as index.md readme.md'
+        name: 'Fixed value for "index.md" file',
+        desc: 'Fixed value sharing by each index'
     },
     fbk_weight_md: {
-        name: 'Default value for normal markdown file',
-        desc: 'Fallback for missing value, such as value undefined'
+        name: 'Default value for normal ".md" file',
+        desc: 'Fallback for normal ".md" file'
     },
     fbk_weight_other: {
-        name: 'Default value for unknown file',
-        desc: 'Default value for files except markdown'
+        name: 'Fixed value for unknown file',
+        desc: 'Fixed value for files except ".md"'
     },
     fbk_retitled: {
-        name: 'Retitled',
-        desc: 'Retitled file will be sorted by its title'
+        name: 'Default value for key "retitled"',
+        desc: 'Controlling the default behavior of folder naming'
+    },
+    filename_index: {
+        name: 'File name of index',
+        desc: 'Do not include the file extension, such as "index", "readme"'
     }
 };
-
-
 
 
 export class NaveightSettingTab extends PluginSettingTab {
@@ -108,14 +91,19 @@ export class NaveightSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        Utils.addTabText(this.plugin, containerEl, 'filename_index');
         new Setting(containerEl)
             .setHeading()
-            .setName('Frontmatter');
+            .setName('Front matter').setDesc('Setting front matter keys and their default values');
 
-        // add SETTING_TAB_INFOS
-        for (const key in DESC_OF_SETTINGS) {
-            Utils.addTabText(this.plugin, containerEl, key as keyof DescOfSettings);
+        const fmSetKeys: (keyof DescOfSettings)[] = ['key_sort', 'fbk_weight_folder', 'fbk_weight_index', 'fbk_weight_md', 'fbk_weight_other']
+        for (const key of fmSetKeys) {
+            Utils.addTabText(this.plugin, containerEl, key);
         }
+        new Setting(containerEl)
+        .setHeading()
+        .setName('Additional').setDesc('Additional settings for users that using "mkdocs" with "mkdocs-nav-weight" as publisher');
+        Utils.addTabText(this.plugin, containerEl, 'fbk_retitled');
 
     }
 }

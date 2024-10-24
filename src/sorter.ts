@@ -1,5 +1,5 @@
 import { FileExplorerView, TFolder, TFile, FolderItem, TAbstractFile, Item } from "obsidian";
-import { CfgFmFbk, CfgFmFbkIdx, CfgFmFbkMd, CfgFmFbkWt, CfgFmKey, CfgFmKeyIdx, CfgFmKeyMd, NwtCfg, RawData } from "setting";
+import { CfgFmFbk, CfgFmKey, NwtCfg } from "setting";
 import Utils from "utils";
 
 
@@ -32,8 +32,8 @@ export default class Sorter {
     private userConfig: NwtCfg
     private fmKFIdx: FmKF
     private fmKFMd: FmKF
-    private headlessIcon: HTMLDivElement
-    private retitledIcon: HTMLDivElement
+    private headlessSVG: string
+    private retitledSVG: string
 
     constructor(fileExpView: FileExplorerView, userConfig: NwtCfg) {
         this.fileExpView = fileExpView
@@ -69,12 +69,8 @@ export default class Sorter {
         }
 
 
-        this.headlessIcon = createDiv()
-        this.headlessIcon.addClass('nav-file-tag')
-        this.headlessIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>'
-        this.retitledIcon = createDiv()
-        this.retitledIcon.addClass('nav-file-tag')
-        this.retitledIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-symlink"><path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h7"/><path d="m8 16 3-3-3-3"/></svg>'
+        this.headlessSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>'
+        this.retitledSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-symlink"><path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h7"/><path d="m8 16 3-3-3-3"/></svg>'
     }
 
     // modified from js source code
@@ -235,26 +231,31 @@ export default class Sorter {
             if (!item) continue;
             sortedItems.push(item)
 
-            this.setIconByFm(child.path, item, true, Boolean(fmDataInFolder[child.path].headless))
-            this.setIconByFm(child.path, item, false, Boolean(fmDataInFolder[child.path].retitled))
+            this.setIconByFm(item, true, Boolean(fmDataInFolder[child.path].headless))
+            this.setIconByFm(item, false, Boolean(fmDataInFolder[child.path].retitled))
         }
         return sortedItems
     }
 
-    private setIconByFm(path: string, item: Item, headlessOrRetitled: boolean, value: boolean) {
+    private setIconByFm(item: Item, headlessOrRetitled: boolean, value: boolean) {
         const selfEl = item.selfEl
-        // console.log(selfEl)
         if (!selfEl) return;
 
-        const icon = headlessOrRetitled ? this.headlessIcon : this.retitledIcon
-        const key = headlessOrRetitled ? 'headless' : 'retitled'
+        const svg = headlessOrRetitled ? this.headlessSVG : this.retitledSVG
+        const className = headlessOrRetitled ? 'nwt-headless' : 'nwt-retitled'
 
-        const isValueTrueInEl = selfEl.getAttribute(key) === 'true'
-
+        const svgEl = selfEl.getElementsByClassName(className).item(0)
+        const hasEl = svgEl !== null
         // console.log(file.path, isItemHeadless, isElHeadless)
-        if (value === isValueTrueInEl) return;
-        if (value) { selfEl.appendChild(icon); selfEl.setAttribute(key, 'true'); }
-        else { selfEl.removeChild(icon); selfEl.setAttribute(key, 'false') }
-
+        if (value === hasEl) return;
+        if (hasEl) {
+            selfEl.removeChild(svgEl);
+            selfEl.setAttribute(className, 'false')
+        } else {
+            const div = selfEl.createDiv()
+            div.addClass('nav-file-tag', className)
+            div.innerHTML = svg;
+        }
     }
+
 }

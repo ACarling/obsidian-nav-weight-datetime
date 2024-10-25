@@ -1,9 +1,3 @@
-import NaveightPlugin from "main";
-import { Setting } from "obsidian";
-import { NwtCfg, RawData, DescOfSettings, DEFAULT_CONFIG as dfltConfig, CfgFmFbk } from "setting";
-import { DESC_OF_SETTINGS as settingsTexts } from "setting";
-import Sorter, { LogMsg } from "sorter";
-
 export default class Utils {
     private static getValidNumberOrNull(num: string): number | null {
         const validNumber = /^[+-]?\d+(\.\d+)?$/;
@@ -24,7 +18,7 @@ export default class Utils {
     }
 
     // a setting data, string
-    private static getStringAsDataOrNull(str: string, expectType: string) {
+    static getStringAsDataOrNull(str: string, expectType: string) {
         switch (expectType) {
             case 'number':
                 return this.getValidNumberOrNull(str);
@@ -37,69 +31,26 @@ export default class Utils {
         }
     }
 
-    // a setting data from setting tab, string. 
-    static getStringAsDataOrDflt<T extends CfgFmFbk[keyof CfgFmFbk] | NwtCfg[keyof NwtCfg]>(str: string, dflt: T, sorter?: Sorter, msg?: LogMsg) {
-        const data = this.getStringAsDataOrNull(str, typeof dflt);
-        if (data !== null) {
-            return data as T
-        }
-        this.tryCatchLogger(sorter, msg);
-        return dflt;
-    }
-
-
     // a setting data loaded data.json/frontmatter, could be anything, so check type first.
-    static getRawAsDataOrDflt<T extends CfgFmFbk[keyof CfgFmFbk] | NwtCfg[keyof NwtCfg]>(raw: RawData, dflt: T, sorter?: Sorter, msg?: LogMsg): T {
-        const expectType = typeof dflt;
-
-        // console.log(raw, typeof raw);
+    static getRawAsDataOrNone(raw: unknown, expectType: string) {
         switch (typeof raw) {
             case 'string':
-                return this.getStringAsDataOrDflt(raw, dflt, sorter, msg);
+                return this.getStringAsDataOrNull(raw, expectType);
             case 'number':
                 if (expectType === 'number' && Number.isFinite(raw)) {
-                    return raw as T;
+                    return raw;
                 }
-                this.tryCatchLogger(sorter, msg);
-                return dflt;
+                return null
             case 'boolean':
                 if (expectType === 'boolean') {
-                    return raw as T;
+                    return raw;
                 }
-                this.tryCatchLogger(sorter, msg);
-                return dflt;
+                return null
             case 'undefined':
-                return dflt;
+                return undefined
             default:
-                this.tryCatchLogger(sorter, msg);
-                return dflt;
+                return null
         }
     }
-
-
-    private static tryCatchLogger(sorter?: Sorter, msg?: LogMsg) {
-        if (sorter && msg) {
-            sorter.catchLogger(msg);
-        }
-    }
-
-    static addTabText(plugin: NaveightPlugin, containerEl: HTMLElement, key: keyof DescOfSettings) {
-        const info = settingsTexts[key];
-        const curr = plugin.userConfig[key];
-        const dflt = dfltConfig[key];
-
-        new Setting(containerEl)
-            .setName(info.name)
-            .setDesc(info.desc)
-            .addText(text => text
-                .setPlaceholder(String(dflt))
-                .setValue(String(curr))
-                .onChange(async (input) => {
-                    // check is valid
-                    (plugin.userConfig[key] as NwtCfg[keyof NwtCfg]) = Utils.getStringAsDataOrDflt(input, dflt);
-                    await plugin.saveSettings();
-                }));
-    }
-
 
 }

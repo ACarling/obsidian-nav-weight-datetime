@@ -6,7 +6,7 @@ declare module 'obsidian' {
     fileItems: Record<string, Item | undefined>;
     tree: {
       infinityScroll: {
-        compute(): unknown;
+        compute(): void;
         rootEl: FolderItem;
       }
     };
@@ -17,14 +17,14 @@ declare module 'obsidian' {
     file?: TAbstractFile
     selfEl?: HTMLElement
     vChildren?: {
-      setChildren(items: Item[]): unknown;
+      setChildren(items: Item[]): void;
     }
   }
 
   interface FolderItem extends Item {
     file: TFolder
     vChildren: {
-      setChildren(items: Item[]): unknown;
+      setChildren(items: Item[]): void;
     }
   }
 }

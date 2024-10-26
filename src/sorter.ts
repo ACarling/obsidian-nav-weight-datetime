@@ -109,11 +109,11 @@ export default class Sorter {
             // expect a folder
             const isFolderItem = itemsByPath.hasOwnProperty(path)
                 && Boolean(item?.vChildren)
-                && folder instanceof TFolder
+                && (folder instanceof TFolder)
             if (false === isFolderItem) continue;
 
             folderItems.push(item as FolderItem)
-            this.cachedFmDataByFolder[folder.path] = {};
+            this.cachedFmDataByFolder[folder!.path] = {};
         }
 
         // cache FmData

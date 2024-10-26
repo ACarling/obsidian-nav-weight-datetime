@@ -4,11 +4,11 @@
 
 This plugin sorts files by recognizing the `weight` key defined in the markdown frontmatter, using its value as a criterion for ordering.
 
-While there are several plugins available that offer customization of navigation, I created this particular plugin because others tend to be overly complex for a lazy person like me.
+While several plugins are available for customizing navigation, I created this particular plugin because the others tend to be overly complex for someone as lazy as me.
 
 ## Usage
 
-### Data Preparation 
+### Data Preparing
 
 Define some `weight` in your markdown files, like:
 ``` markdown
@@ -17,29 +17,31 @@ weight: 1
 ---
 ```
 
-### Sort
+>[!NOTE]
+>
+> To sort a `folder`, you need an `index` file within it. The file name of the `index` can be configured in Settings. The `weight` of the `index` will be used as the `weight` of the `folder`. Additionally, the `index` itself has a **fixed** `weight` that can also be configured in Settings.
+
+
+### Sorting
 
 Click the following icon in the left ribbon.
 
 ![](./assets/sort-icon.svg)
 
-### Result check
+### Result checking
 
-You can find one of the following icons in the bottom status bar, move your mouse over the icon to get the tool-tip.
+You can find one of the following icons in the bottom status bar. Move your mouse over the icon to see the tooltip.
 
 ![](./assets/question-icon.svg)
 ![](./assets/check-icon.svg)
 
+## Additional
 
----
 > [!TIP]
-> If you are using [mkdocs](https://www.mkdocs.org/) as publisher, you can find the similar plugin mkdocs-nav-weight for mkdocs at [here](https://github.com/shu307/mkdocs-nav-weight).
-> 
-> **All features of "mkdocs-nav-weight" have been implemented in this plugin**.
-> 
-> After sorting, you may encounter the following icons, which respectively represent `headless: true` and `retitled: true`, displayed alongside the names of files or folders.
->
-> ![](./assets/leaf.svg) `headless: true` 
-> 
-> ![](./assets/text-cursor-input.svg) `retitled: true`
->  
+> If you are using [MkDocs](https://www.mkdocs.org/) as your documentation publisher, you can find a similar plugin for MkDocs at [this link](https://github.com/shu307/mkdocs-nav-weight).
+
+All features of mkdocs-nav-weight have been implemented in this plugin, but you need to **manually enable** this feature in the Settings.
+
+After sorting, you may encounter the following icons, which respectively represent `headless: true` or `empty: true`, and `retitled: true`, displayed alongside the names of files or folders.
+
+![](./assets/leaf.svg) ![](./assets/text-cursor-input.svg)

@@ -1,5 +1,5 @@
-import { QUESTION_SVG, SETTINGS_DESC, SORT_SVG, DEFAULT_CONFIG as dfltConfig } from "consts";
-import { FileExplorerView, Plugin, setTooltip } from 'obsidian';
+import { SETTINGS_DESC, DEFAULT_CONFIG as dfltConfig } from "consts";
+import { FileExplorerView, Plugin, setIcon, setTooltip } from 'obsidian';
 import { NaveightSettingTab } from "setting";
 import Sorter from 'sorter';
 import { NwtCfg, NwtSet } from "types/types";
@@ -15,26 +15,25 @@ export default class NaveightPlugin extends Plugin {
 
 			// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 			const statusBarEl = this.addStatusBarItem();
-			const span = statusBarEl.createSpan({ cls: 'status-bar-item-icon' });
-			span.innerHTML = QUESTION_SVG;
+			const statusBarSpan = statusBarEl.createSpan({ cls: 'status-bar-item-icon' });
+			setIcon(statusBarSpan, 'file-x');
 			setTooltip(statusBarEl, 'Nav Weight: Unsorted', { placement: 'top' })
 
 
 			// This creates an icon in the left ribbon.
-			const ribbonIconEl = this.addRibbonIcon('', 'Sort navigation', async () => {
+			this.addRibbonIcon('arrow-down-01', 'Sort navigation', async () => {
 
-				// 🖕 fuck obsidian 
 				// its n.view.getViewType(), not n.type
 				const leaves = this.app.workspace.getLeavesOfType("file-explorer");
 				const leaf = leaves[0];
-				if (!leaf) return;
+				if (!leaf)
+					return;
 
-				const sorter = new Sorter(leaf.view as FileExplorerView, this.userConfig, statusBarEl);
+				const sorter = new Sorter(leaf.view as FileExplorerView, this.userConfig, statusBarEl, statusBarSpan);
 				sorter.sort();
 
 			});
-			// Perform additional things with the ribbon
-			ribbonIconEl.innerHTML = SORT_SVG;
+
 
 
 

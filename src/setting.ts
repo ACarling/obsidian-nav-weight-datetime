@@ -20,7 +20,8 @@ export class NaveightSettingTab extends PluginSettingTab {
         this.addTabTextNwt(containerEl, 'filename_index');
         new Setting(containerEl)
             .setHeading()
-            .setName('Front matter').setDesc('Setting front matter keys and their default values');
+            .setName('Front matter')
+            .setDesc('Setting front matter keys and their default values.');
 
         type ExcludedKey = keyof (Pick<NwtSet, 'filename_index'> & NwtSetToggle)
         const excludedKeys: (ExcludedKey)[] = ['filename_index', 'all_features', 'fbk_retitled']
@@ -33,7 +34,9 @@ export class NaveightSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setHeading()
-            .setName('Additional').setDesc('Additional settings for users that using "mkdocs" with "mkdocs-nav-weight" as publisher');
+            .setName('Additional')
+            .setDesc('Additional settings for users that using "mkdocs" with "mkdocs-nav-weight" as publisher.');
+
         this.addTabToggleNwt(containerEl, 'all_features');
         this.addTabToggleNwt(containerEl, 'fbk_retitled');
 

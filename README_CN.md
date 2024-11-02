@@ -1,4 +1,4 @@
-# Obsidian Nav Weight
+# Nav Weight
 
 [[中文](./README_CN.md)]
 
@@ -28,14 +28,14 @@ weight: 1
 
 点击左侧边栏中的下面这个图标。
 
-![](./assets/sort-icon.svg)
+![](./assets/arrow-down-0-1.svg)
 
 ### 查看结果
 
 你会在底部状态栏中看到以下图标，将鼠标悬停在图标上以查看提示信息。
 
-![](./assets/question-icon.svg)
-![](./assets/check-icon.svg)
+![](./assets/file-check.svg)
+![](./assets/file-x.svg)
 
 ## 其它功能
 

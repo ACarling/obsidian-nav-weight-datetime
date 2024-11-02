@@ -1,4 +1,4 @@
-# Obsidian Nav Weight
+# Nav Weight
 
 [[中文](./README_CN.md)]
 
@@ -28,14 +28,14 @@ weight: 1
 
 Click the following icon in the left ribbon.
 
-![](./assets/sort-icon.svg)
+![](./assets/arrow-down-0-1.svg)
 
 ### Result checking
 
 You can find one of the following icons in the bottom status bar. Move your mouse over the icon to see the tooltip.
 
-![](./assets/question-icon.svg)
-![](./assets/check-icon.svg)
+![](./assets/file-check.svg)
+![](./assets/file-x.svg)
 
 ## Additional
 

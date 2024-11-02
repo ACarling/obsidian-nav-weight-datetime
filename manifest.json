@@ -3,7 +3,7 @@
 	"name": "Nav Weight",
 	"version": "1.0.11",
 	"minAppVersion": "1.7.4",
-	"description": "Sort your navigation items by markdown frontmatter.",
+	"description": "Sort your navigation items by Markdown frontmatter.",
 	"author": "shu307",
 	"authorUrl": "https://github.com/shu307",
 	"isDesktopOnly": true

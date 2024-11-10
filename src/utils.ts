@@ -10,9 +10,9 @@ export default class Utils {
     }
 
     private static getValidBooleanOrNull(bool: string): boolean | null {
-        const isTrue = bool === 'true'
-        const isFalse = bool === 'false'
-        const isValid = isTrue || isFalse
+        const isTrue = bool === "true";
+        const isFalse = bool === "false";
+        const isValid = isTrue || isFalse;
 
         return isValid ? (isTrue ? true : false) : null;
     }
@@ -20,11 +20,11 @@ export default class Utils {
     // a setting data, string
     static getStringAsDataOrNull(str: string, expectType: string) {
         switch (expectType) {
-            case 'number':
+            case "number":
                 return this.getValidNumberOrNull(str);
-            case 'string':
+            case "string":
                 return this.getValidStringOrNull(str);
-            case 'boolean':
+            case "boolean":
                 return this.getValidBooleanOrNull(str);
             default:
                 return null;
@@ -34,23 +34,22 @@ export default class Utils {
     // a setting data loaded data.json/frontmatter, could be anything, so check type first.
     static getRawAsDataOrNone(raw: unknown, expectType: string) {
         switch (typeof raw) {
-            case 'string':
+            case "string":
                 return this.getStringAsDataOrNull(raw, expectType);
-            case 'number':
-                if (expectType === 'number' && Number.isFinite(raw)) {
+            case "number":
+                if (expectType === "number" && Number.isFinite(raw)) {
                     return raw;
                 }
-                return null
-            case 'boolean':
-                if (expectType === 'boolean') {
+                return null;
+            case "boolean":
+                if (expectType === "boolean") {
                     return raw;
                 }
-                return null
-            case 'undefined':
-                return undefined
+                return null;
+            case "undefined":
+                return undefined;
             default:
-                return null
+                return null;
         }
     }
-
 }

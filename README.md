@@ -13,29 +13,28 @@ While several plugins are available for customizing navigation, I created this p
 ### Data Preparing
 
 Define some `weight` in your markdown files, like:
-``` markdown
+
+```markdown
 ---
 weight: 1
 ---
 ```
 
->[!NOTE]
->
+> [!NOTE]
 > To sort a `folder`, you need an `index` file within it. The file name of the `index` can be configured in Settings. The `weight` of the `index` will be used as the `weight` of the `folder`. Additionally, the `index` itself has a **fixed** `weight` that can also be configured in Settings.
-
 
 ### Sorting
 
 Click the following icon in the left ribbon.
 
-![](./assets/arrow-down-0-1.svg)
+![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
 
 ### Result checking
 
 You can find one of the following icons in the bottom status bar. Move your mouse over the icon to see the tooltip.
 
-![](./assets/file-check.svg)
-![](./assets/file-x.svg)
+![file-check.svg](./assets/file-check.svg)
+![file-x.svg](./assets/file-x.svg)
 
 ## Additional
 
@@ -46,4 +45,4 @@ All features of mkdocs-nav-weight have been implemented in this plugin, but you 
 
 After sorting, you may encounter the following icons, which respectively represent `headless: true` or `empty: true`, and `retitled: true`, displayed alongside the names of files or folders.
 
-![](./assets/leaf.svg) ![](./assets/text-cursor-input.svg)
+![leaf.svg](./assets/leaf.svg) ![text-cursor-input.svg](./assets/text-cursor-input.svg)

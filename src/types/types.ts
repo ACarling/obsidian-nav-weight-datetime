@@ -19,14 +19,15 @@ export interface NwtCfg extends CfgFmKey, CfgFmFbk {
     all_features: boolean;
 }
 
-export type NwtSet = Omit<NwtCfg, 'key_headless_index' | 'key_headless_md' | 'key_retitled' | 'fbk_headless'>;
-export type NwtSetText = Omit<NwtSet, 'all_features' | 'fbk_retitled'>
-export type NwtSetToggle = Pick<NwtSet, 'all_features' | 'fbk_retitled'>
+export type NwtCfgRecord = Record<keyof NwtCfg, NwtCfg[keyof NwtCfg]>;
+
+export type NwtSet = Omit<NwtCfg, "key_headless_index" | "key_headless_md" | "key_retitled" | "fbk_headless">;
+export type NwtSetText = Omit<NwtSet, "all_features" | "fbk_retitled">;
+export type NwtSetToggle = Pick<NwtSet, "all_features" | "fbk_retitled">;
 
 type Desc = {
     name: string;
     desc: string;
-}
+};
 
 export type SettingsDesc = Record<keyof NwtSet, Desc>;
-

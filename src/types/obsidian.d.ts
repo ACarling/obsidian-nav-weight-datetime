@@ -3,7 +3,7 @@ import "obsidian";
 declare module "obsidian" {
     interface FileExplorerView extends View {
         ready: boolean;
-        fileItems: Record<string, Item | undefined>;
+        fileItems: Record<string, Item>;
         tree: {
             infinityScroll: {
                 compute(): void;

@@ -1,9 +1,10 @@
-import { NwtCfg, SettingsDesc } from "types/types";
+import { NvtCfg, NvtSetDesc } from "types/types";
 
-export const DEFAULT_CONFIG: NwtCfg = {
+export const DEFAULT_CONFIG: NvtCfg = {
+    filename_index: "index",
     key_sort: "weight",
-    key_headless_index: "empty",
-    key_headless_md: "headless",
+    key_headless: "headless",
+    key_empty: "empty",
     key_retitled: "retitled",
     fbk_weight_folder: -20,
     fbk_weight_index: -10,
@@ -11,11 +12,14 @@ export const DEFAULT_CONFIG: NwtCfg = {
     fbk_weight_other: 20,
     fbk_headless: false,
     fbk_retitled: false,
-    filename_index: "index",
     all_features: false,
 };
 
-export const SETTINGS_DESC: SettingsDesc = {
+export const SETTINGS_DESC: NvtSetDesc = {
+    filename_index: {
+        name: "File name of index",
+        desc: 'Do not include the file extension, such as "index", "readme".',
+    },
     key_sort: {
         name: "Sort key",
         desc: 'The key defined in the frontmatter and use its value as a weight to sort the ".md" files, eg: "weight", "order".',
@@ -39,10 +43,6 @@ export const SETTINGS_DESC: SettingsDesc = {
     fbk_retitled: {
         name: 'Default value for key "retitled"',
         desc: 'Controlling the default behavior of folder naming, "ON" is "true", "OFF" is "false".',
-    },
-    filename_index: {
-        name: "File name of index",
-        desc: 'Do not include the file extension, such as "index", "readme".',
     },
     all_features: {
         name: 'Enable features for "mkdocs-nav-weight"',

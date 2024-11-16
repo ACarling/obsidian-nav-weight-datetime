@@ -1,35 +1,38 @@
 import { DEFAULT_CONFIG, SETTINGS_DESC } from "consts";
 import NaveightPlugin from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { NwtCfgRecord, NwtSet, NwtSetText, NwtSetToggle } from "types/types";
-import Utils from "utils";
+import { NvtSet, NvtSetText, NvtSetToggle } from "types/types";
 
 export class NaveightSettingTab extends PluginSettingTab {
     plugin: NaveightPlugin;
+    modifiedConfig: Partial<NvtSet>;
 
     constructor(app: App, plugin: NaveightPlugin) {
         super(app, plugin);
         this.plugin = plugin;
     }
-
+    hide(): void {
+        super.hide();
+        this.plugin.saveSettings(this.modifiedConfig, true);
+    }
     display(): void {
         const { containerEl } = this;
 
         containerEl.empty();
 
-        this.addTabTextNwt(containerEl, "filename_index");
+        this.addTabText(containerEl, "filename_index");
         new Setting(containerEl)
             .setHeading()
             .setName("Front matter")
             .setDesc("Setting front matter keys and their default values.");
 
-        type ExcludedKey = keyof (Pick<NwtSet, "filename_index"> & NwtSetToggle);
+        type ExcludedKey = keyof (Pick<NvtSet, "filename_index"> & NvtSetToggle);
         const excludedKeys: ExcludedKey[] = ["filename_index", "all_features", "fbk_retitled"];
         for (const key in SETTINGS_DESC) {
             if (excludedKeys.contains(key as ExcludedKey)) {
                 continue;
             }
-            this.addTabTextNwt(containerEl, key as keyof NwtSetText);
+            this.addTabText(containerEl, key as keyof NvtSetText);
         }
 
         new Setting(containerEl)
@@ -37,11 +40,11 @@ export class NaveightSettingTab extends PluginSettingTab {
             .setName("Additional")
             .setDesc('Additional settings for users that using "mkdocs" with "mkdocs-nav-weight" as publisher.');
 
-        this.addTabToggleNwt(containerEl, "all_features");
-        this.addTabToggleNwt(containerEl, "fbk_retitled");
+        this.addTabToggle(containerEl, "all_features");
+        this.addTabToggle(containerEl, "fbk_retitled");
     }
 
-    addTabTextNwt(containerEl: HTMLElement, key: keyof NwtSetText) {
+    addTabText<K extends keyof NvtSetText>(containerEl: HTMLElement, key: K) {
         const desc = SETTINGS_DESC[key];
         const curr = this.plugin.userConfig[key];
         const dflt = DEFAULT_CONFIG[key];
@@ -55,14 +58,13 @@ export class NaveightSettingTab extends PluginSettingTab {
                     .setValue(String(curr))
                     .onChange(async (input) => {
                         // check is valid
-                        const data = Utils.getStringAsDataOrNull(input, typeof dflt);
-                        (this.plugin.userConfig as NwtCfgRecord)[key] = data === null ? dflt : data;
-                        await this.plugin.saveSettings();
+                        const data = await this.plugin.getDataOrNull(input, dflt);
+                        this.modifiedConfig[key] = data ?? dflt;
                     })
             );
     }
 
-    addTabToggleNwt(containerEl: HTMLElement, key: keyof Pick<NwtSet, "all_features" | "fbk_retitled">) {
+    addTabToggle(containerEl: HTMLElement, key: keyof Pick<NvtSet, "all_features" | "fbk_retitled">) {
         const desc = SETTINGS_DESC[key];
         const curr = this.plugin.userConfig[key];
 
@@ -71,8 +73,7 @@ export class NaveightSettingTab extends PluginSettingTab {
             .setDesc(desc.desc)
             .addToggle((toggle) =>
                 toggle.setValue(curr).onChange(async (value) => {
-                    this.plugin.userConfig[key] = value;
-                    await this.plugin.saveSettings();
+                    this.modifiedConfig[key] = value;
                 })
             );
     }

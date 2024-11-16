@@ -1,11 +1,11 @@
-export interface CfgFmKey {
+export interface NvtCfgFmKey {
     key_sort: string;
-    key_headless_index: string;
-    key_headless_md: string;
+    key_headless: string;
+    key_empty: string;
     key_retitled: string;
 }
 
-export interface CfgFmFbk {
+export interface NvtCfgFmFbk {
     fbk_weight_folder: number;
     fbk_weight_index: number;
     fbk_weight_md: number;
@@ -14,20 +14,18 @@ export interface CfgFmFbk {
     fbk_retitled: boolean;
 }
 
-export interface NwtCfg extends CfgFmKey, CfgFmFbk {
+export interface NvtCfg extends NvtCfgFmKey, NvtCfgFmFbk {
     filename_index: string;
     all_features: boolean;
 }
 
-export type NwtCfgRecord = Record<keyof NwtCfg, NwtCfg[keyof NwtCfg]>;
-
-export type NwtSet = Omit<NwtCfg, "key_headless_index" | "key_headless_md" | "key_retitled" | "fbk_headless">;
-export type NwtSetText = Omit<NwtSet, "all_features" | "fbk_retitled">;
-export type NwtSetToggle = Pick<NwtSet, "all_features" | "fbk_retitled">;
+export type NvtSet = Omit<NvtCfg, "key_empty" | "key_headless" | "key_retitled" | "fbk_headless">;
+export type NvtSetText = Omit<NvtSet, "all_features" | "fbk_retitled">;
+export type NvtSetToggle = Pick<NvtSet, "all_features" | "fbk_retitled">;
 
 type Desc = {
     name: string;
     desc: string;
 };
 
-export type SettingsDesc = Record<keyof NwtSet, Desc>;
+export type NvtSetDesc = Record<keyof NvtSet, Desc>;

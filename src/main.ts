@@ -1,8 +1,8 @@
-import { SETTINGS_DESC, DEFAULT_CONFIG as dfltConfig } from "consts";
-import { FileExplorerView, Plugin, setIcon, setTooltip } from "obsidian";
-import { NaveightSettingTab } from "setting";
+import { DEFAULT_CONFIG as dfltConfig } from "consts";
+import { FileExplorerView, Notice, Plugin, setIcon, setTooltip } from "obsidian";
+import { NaveightSettingTab } from "settingTab";
 import Sorter from "sorter";
-import { NvtCfg, NvtSet } from "types/types";
+import { NvtCfg } from "types/types";
 import Utils from "utils";
 
 export default class NaveightPlugin extends Plugin {
@@ -10,114 +10,118 @@ export default class NaveightPlugin extends Plugin {
     statusBarEl: HTMLElement;
     statusBarSpan: HTMLElement;
     sorter: Sorter;
+    settingKeys: (keyof NvtCfg)[];
 
     async onload() {
         await this.loadSettings();
 
-        this.app.workspace.onLayoutReady(() => {
-            // This adds a status bar item to the bottom of the app. Does not work on mobile apps.
+        this.app.workspace.onLayoutReady(async () => {
+            // ! Step.1: adds a status bar item.
             this.statusBarEl = this.addStatusBarItem();
             this.statusBarSpan = this.statusBarEl.createSpan({
                 cls: "status-bar-item-icon",
             });
-
+            // ! Step.2: get file explorer view
+            // it's n.view.getViewType(), not n.type
             const leaf = this.app.workspace.getLeavesOfType("file-explorer")[0];
+            // console.log(leaf);
             if (!leaf) {
-                this.setStatusBar("error: can not find file explorer leaf", false);
+                this.setStatusBar("error: can not find file explorer leaf", "!");
                 return;
             }
-            this.setStatusBar("unsorted", false);
-
+            // ! Step.3: init sorter
             this.sorter = new Sorter(leaf.view as FileExplorerView, this);
-            // auto sortAll
+            this.sorter.updateParsingCaches();
             this.sorter.sortAll();
-
-            // sorter needed
-            this.addRibbonIcon("arrow-down-01", "Sort navigation", async () => {
-                // its n.view.getViewType(), not n.type
+            // ! Step.4: add ribbon icon and setting tab
+            // sorter needed, caches needed
+            const ribbonIcon = this.addRibbonIcon("arrow-down-01", "Nav Weight: click to disable", () => {
+                const lastStatus = this.sorter.isOn;
+                if (lastStatus) {
+                    this.sorter.needCleanupIcons = true;
+                    // next status is disable
+                    setTooltip(ribbonIcon, "Nav Weight: click to enable");
+                    ribbonIcon.classList.add("nvt-ribbon-disable");
+                } else {
+                    setTooltip(ribbonIcon, "Nav Weight: click to disable");
+                    ribbonIcon.classList.remove("nvt-ribbon-disable");
+                }
+                this.sorter.sortAll();
+                this.sorter.isOn = !lastStatus;
                 this.sorter.sortAll();
             });
-
-            // sorter needed, auto sortAll on save
             this.addSettingTab(new NaveightSettingTab(this.app, this));
+            // ! Step.5: register auto-sort events
+
+            // Obsidian calls this at most every 2 seconds.
+            this.registerEvent(this.app.metadataCache.on("changed", this.sorter.OnMetadataCacheChanged, this.sorter));
+
+            // console.log(leaf.view);
         });
     }
 
-    onunload() {}
+    onunload() {
+        this.sorter.needCleanupIcons = true;
+        // cleanup icons
+        this.sorter.sortAll();
+        // unPatch
+        this.sorter.patcher.unPatch();
+        // restore original sorting
+        this.sorter.sortAll();
+    }
 
     async loadSettings() {
-        const loadedRaw = Object.assign({}, await this.loadData()) as NvtCfg;
-        const loadedSet: Partial<NvtSet> = {};
+        // build setting keys
+        this.settingKeys = Object.keys(dfltConfig) as (keyof NvtCfg)[];
 
-        const cfgKeys = Object.keys(SETTINGS_DESC) as (keyof NvtSet)[];
-        cfgKeys.forEach(async <K extends keyof NvtSet>(key: K) => {
+        const loadedRaw = Object.assign({}, await this.loadData()) as NvtCfg;
+        const loadedSet: Partial<NvtCfg> = {};
+
+        this.settingKeys.forEach(<K extends keyof NvtCfg>(key: K) => {
             const dflt = dfltConfig[key];
-            loadedSet[key] = (await this.getRawOrNone(loadedRaw[key], dflt)) ?? dflt;
+            loadedSet[key] = Utils.parseRawData(loadedRaw[key], dflt) ?? dflt;
         });
 
-        await this.saveSettings(loadedSet, false);
+        await this.saveSettings(loadedSet, true);
     }
 
-    async saveSettings(partialConfig: Partial<NvtCfg>, existSorter: boolean) {
-        this.userConfig = Object.assign({}, dfltConfig, this.userConfig, partialConfig);
-        if (existSorter) {
-            // apply new settings to caches
-            this.sorter.updateCachesForParsing();
-            // auto sortAll
+    async saveSettings(partialConfig: Partial<NvtCfg>, firstSave: boolean) {
+        if (firstSave) {
+            this.userConfig = Object.assign({}, dfltConfig, partialConfig);
+        } else {
+            this.userConfig = Object.assign({}, this.userConfig, partialConfig);
+            // ! apply new settings to caches and trigger a sorting
+            this.sorter.updateParsingCaches();
             this.sorter.sortAll();
         }
-        const savingSet: Partial<NvtSet> = {};
+        const savingSet: Partial<NvtCfg> = {};
 
-        const setKeys = Object.keys(SETTINGS_DESC) as (keyof NvtSet)[];
-        setKeys.forEach(<K extends keyof NvtSet>(key: K) => {
+        this.settingKeys.forEach(<K extends keyof NvtCfg>(key: K) => {
             savingSet[key] = this.userConfig[key];
         });
 
         await this.saveData(savingSet);
     }
 
-    async setStatusBar(tooltip: string, sorted: boolean) {
-        const icon = sorted ? "file-check" : "file-x";
+    setStatusBar(tooltip: string, status: "v" | "x" | "!") {
+        const tt = `Nav Weight\n${tooltip}`;
+        // this.latestTooltip = tooltip;
+        let icon;
+        switch (status) {
+            case "v":
+                icon = "file-check";
+                break;
+            case "x":
+                icon = "file-x";
+                break;
+            default:
+                icon = "file-warning";
+                new Notice(tt, 5000);
+        }
 
         setIcon(this.statusBarSpan, icon);
-        setTooltip(this.statusBarEl, `Nav Weight\n${tooltip}`, {
+        setTooltip(this.statusBarEl, tt, {
             placement: "top",
         });
-    }
-
-    async getDataOrNull<T>(str: string, dflt: T) {
-        switch (typeof dflt) {
-            case "number":
-                return Utils.parseNumber(str) as T | null;
-            case "string":
-                return Utils.parseString(str) as T | null;
-            case "boolean":
-                return Utils.parseBoolean(str) as T | null;
-
-            // ! Impossible to happen.
-            default:
-                return null;
-        }
-    }
-
-    async getRawOrNone<T>(raw: unknown, dflt: T) {
-        switch (typeof raw) {
-            case "string":
-                return this.getDataOrNull(raw, dflt);
-            case "number":
-                if (typeof dflt === "number" && Number.isFinite(raw)) {
-                    return raw as T;
-                }
-                return null;
-            case "boolean":
-                if (typeof dflt === "boolean") {
-                    return raw as T;
-                }
-                return null;
-            case "undefined":
-                return undefined;
-            default:
-                return null;
-        }
     }
 }

@@ -11,6 +11,8 @@ declare module "obsidian" {
             };
         };
         navFileContainerEl: HTMLElement;
+        sort(): void;
+        getSortedFolderItems(folder: TFolder): Item[];
     }
 
     interface Item {

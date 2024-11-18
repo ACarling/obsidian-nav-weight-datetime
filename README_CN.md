@@ -10,6 +10,10 @@
 
 ## 使用
 
+确保左侧边栏中的下面这个图标是激活状态。
+
+![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
+
 ### 数据准备
 
 在 markdown 文件中定义一个 `weight` :
@@ -25,9 +29,7 @@ weight: 1
 
 ### 排序
 
-点击左侧边栏中的下面这个图标。
-
-![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
+只要边栏的图标是点亮状态，排序是自动的
 
 ### 查看结果
 
@@ -35,6 +37,7 @@ weight: 1
 
 ![file-check.svg](./assets/file-check.svg)
 ![file-x.svg](./assets/file-x.svg)
+![file-warning.svg](./assets/file-warning.svg)
 
 ## 其它功能
 

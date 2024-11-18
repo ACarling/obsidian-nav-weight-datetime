@@ -10,6 +10,10 @@ While several plugins are available for customizing navigation, I created this p
 
 ## Usage
 
+Make sure the following icon in the left ribbon is activated (lit up).
+
+![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
+
 ### Data Preparing
 
 Define some `weight` in your markdown files, like:
@@ -21,13 +25,13 @@ weight: 1
 ```
 
 > [!NOTE]
-> To sort a `folder`, you need an `index` file within it. The file name of the `index` can be configured in Settings. The `weight` of the `index` will be used as the `weight` of the `folder`. Additionally, the `index` itself has a **fixed** `weight` that can also be configured in Settings.
+> To sort a `folder`, you need an `index` file within it. The file name of the `index` can be configured in Settings. The `weight` of the `index` will be used as the `weight` of the `folder`.
+>
+> Additionally, the `index` itself has a **fixed** `weight` that can also be configured in Settings.
 
 ### Sorting
 
-Click the following icon in the left ribbon.
-
-![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
+When the left ribbon icon is activated, sorting is automatic if you have defined some `weight`.
 
 ### Result checking
 
@@ -35,6 +39,7 @@ You can find one of the following icons in the bottom status bar. Move your mous
 
 ![file-check.svg](./assets/file-check.svg)
 ![file-x.svg](./assets/file-x.svg)
+![file-warning.svg](./assets/file-warning.svg)
 
 ## Additional
 

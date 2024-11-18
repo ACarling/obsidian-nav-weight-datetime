@@ -1,6 +1,6 @@
 {
 	"name": "nav-weight",
-	"version": "1.0.13",
+	"version": "1.1.0",
 	"description": "Sort your navigation items by markdown frontmatter.",
 	"main": "main.js",
 	"scripts": {

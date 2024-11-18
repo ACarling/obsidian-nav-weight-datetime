@@ -10,7 +10,7 @@ export default class Utils {
 
     static parseString(str: string): string | null {
         const validString = /^[a-zA-Z_][a-zA-Z0-9_-]*$/;
-        const isValid = validString.test(str) && PROTECTED_KEYS.includes(str);
+        const isValid = validString.test(str) && !PROTECTED_KEYS.includes(str);
         return isValid ? str : null;
     }
 

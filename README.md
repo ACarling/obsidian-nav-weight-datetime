@@ -10,7 +10,7 @@ While several plugins are available for customizing navigation, I created this p
 
 ## Usage
 
-Make sure the following icon in the left ribbon is activated (lit up).
+Make sure the following icon in the left ribbon is activated (lit up). You can enable/disable the plugin temporary as you wish by clicking it, but not now.
 
 ![arrow-down-0-1.svg](./assets/arrow-down-0-1.svg)
 

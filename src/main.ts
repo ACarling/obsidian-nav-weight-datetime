@@ -94,13 +94,8 @@ export default class NaveightPlugin extends Plugin {
             this.sorter.updateParsingCaches();
             this.sorter.sortAll();
         }
-        const savingSet: Partial<NvtCfg> = {};
 
-        this.settingKeys.forEach(<K extends keyof NvtCfg>(key: K) => {
-            savingSet[key] = this.userConfig[key];
-        });
-
-        await this.saveData(savingSet);
+        await this.saveData(this.userConfig);
     }
 
     setStatusBar(tooltip: string, status: "v" | "x" | "!") {

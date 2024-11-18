@@ -76,7 +76,8 @@ export class NaveightSettingTab extends PluginSettingTab {
                     .onChange((input) => {
                         // check is valid
                         const data = Utils.parseStringData(input, dflt);
-                        this.modifiedConfig[key] = data ?? dflt;
+                        if (data === null) return;
+                        this.modifiedConfig[key] = data;
                     })
             );
     }

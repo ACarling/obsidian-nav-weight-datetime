@@ -6,7 +6,10 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"release-major": "npm run build && npm version major && git push origin --tags",
+		"release-minor": "npm run build && npm version minor && git push origin --tags",
+		"release-patch": "npm run build && npm version patch && git push origin --tags"
 	},
 	"keywords": [],
 	"author": "shu307",

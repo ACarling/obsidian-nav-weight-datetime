@@ -1,7 +1,7 @@
 {
 	"id": "nav-weight",
 	"name": "Nav Weight",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"minAppVersion": "1.7.4",
 	"description": "Sort your navigation items by Markdown frontmatter.",
 	"author": "shu307",

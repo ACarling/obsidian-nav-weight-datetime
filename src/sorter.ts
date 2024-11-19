@@ -31,7 +31,7 @@ type MarkdownParsingKeys = Pick<IndexParsingKeys, "weight" | "headless">;
 
 export default class Sorter {
     private readonly fileExplorerView: FileExplorerView;
-    readonly plugin: NaveightPlugin;
+    private readonly plugin: NaveightPlugin;
     private readonly metadataCache: MetadataCache;
 
     // ! hard patch
@@ -44,7 +44,6 @@ export default class Sorter {
     needCleanupIcons: boolean;
 
     // caches for sorting
-    private itemsInVault: Record<string, Item>;
     private fmDataInVault: FmDataInVault;
     private logger: string[];
 
@@ -64,14 +63,13 @@ export default class Sorter {
         this.plugin = plugin;
         this.metadataCache = plugin.app.metadataCache;
 
-        this.patcher = new Patcher(this, fileExpView);
+        this.patcher = new Patcher(this, plugin, fileExpView);
 
         this.isOn = true;
 
         this.inCaching = false;
         this.needCleanupIcons = false;
 
-        this.itemsInVault = {};
         this.fmDataInVault = {};
         this.logger = [];
     }
@@ -141,7 +139,6 @@ export default class Sorter {
         const vault = fileExplorerView.app.vault;
 
         const itemsInVault = Object.assign({}, fileExplorerView.fileItems);
-        this.itemsInVault = itemsInVault;
         // console.log(itemsInVault);
 
         // init sort caches
@@ -156,6 +153,7 @@ export default class Sorter {
             const item = itemsInVault[path];
             // expect a folder
             if (item.vChildren && item.file instanceof TFolder) {
+                // console.log(item);
                 folderItems.push(item as FolderItem);
                 // ! Create "{}" for each folder path.
                 // ! so that "index" can insert the fmData of its parent in parent.parent
@@ -297,42 +295,45 @@ export default class Sorter {
               };
     }
 
-    getItemsAndSetIcons(folder: TFolder) {
+    getItemsAndSetIcons(folder: TFolder, sortedItemsOriginal: Item[]) {
         const fmDataInFolder = this.fmDataInVault[folder.path];
-        const absFileArray = folder.children.slice();
-        // sort file
-        absFileArray.sort((a, b) => {
-            return fmDataInFolder[a.path].weight - fmDataInFolder[b.path].weight;
-        });
-
-        const sortedItems: Item[] = [];
-
         const needCleanupIcons = this.needCleanupIcons;
         const allFeatures = this.allFeatures;
-        for (const absFile of absFileArray) {
-            const item = this.itemsInVault[absFile.path];
-            sortedItems.push(item);
+        return sortedItemsOriginal
+            .map((item, index) => {
+                return {
+                    index,
+                    weight: fmDataInFolder[item.file.path].weight,
+                    item,
+                };
+            })
+            .sort((a, b) => {
+                const diff = a.weight - b.weight;
+                return Math.abs(diff) < 1e-5 ? a.index - b.index : diff;
+            })
+            .map(({ item }): Item => {
+                let headless;
+                let retitled;
+                const absFile = item.file;
 
-            let headless;
-            let retitled;
+                // ! cleanup icons if all_features turn off or plugin disable.
+                if (needCleanupIcons) {
+                    headless = false;
+                    retitled = false;
+                } else if (allFeatures) {
+                    headless = fmDataInFolder[absFile.path].headless as boolean;
+                    retitled = fmDataInFolder[absFile.path].retitled as boolean;
+                } else {
+                    return item;
+                }
+                // set icon for headless/retitled
+                this.setNavItemIcon(item, "leaf", "nvt-headless", headless);
+                if (absFile instanceof TFolder) {
+                    this.setNavItemIcon(item, "text-cursor-input", "nvt-retitled", retitled);
+                }
 
-            // ! cleanup icons if all_features turn off or plugin disable.
-            if (needCleanupIcons) {
-                headless = false;
-                retitled = false;
-            } else if (allFeatures) {
-                headless = fmDataInFolder[absFile.path].headless as boolean;
-                retitled = fmDataInFolder[absFile.path].retitled as boolean;
-            } else {
-                continue;
-            }
-            // set icon for headless/retitled
-            this.setNavItemIcon(item, "leaf", "nvt-headless", headless);
-            if (!(absFile instanceof TFolder)) continue;
-            this.setNavItemIcon(item, "text-cursor-input", "nvt-retitled", retitled);
-        }
-
-        return sortedItems;
+                return item;
+            });
     }
 
     private setNavItemIcon(item: Item, icon: string, iconContainerClsName: string, desiringIcon: boolean) {

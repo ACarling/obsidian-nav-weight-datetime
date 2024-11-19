@@ -16,8 +16,8 @@ declare module "obsidian" {
     }
 
     interface Item {
-        file?: TAbstractFile;
-        selfEl?: HTMLElement;
+        file: TAbstractFile;
+        selfEl: HTMLElement;
         vChildren?: {
             setChildren(items: Item[]): void;
         };

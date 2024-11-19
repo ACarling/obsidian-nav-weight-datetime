@@ -9,6 +9,7 @@ export default class NaveightPlugin extends Plugin {
     userConfig: NvtCfg;
     statusBarEl: HTMLElement;
     statusBarSpan: HTMLElement;
+    ribbonIcon: HTMLElement;
     sorter: Sorter;
     settingKeys: (keyof NvtCfg)[];
 
@@ -33,22 +34,15 @@ export default class NaveightPlugin extends Plugin {
             this.sorter = new Sorter(leaf.view as FileExplorerView, this);
             this.sorter.updateParsingCaches();
             this.sorter.sortAll();
-            // ! Step.4: add ribbon icon and setting tab
+            // ! Step.4: add ribbon icon, command and setting tab
             // sorter needed, caches needed
-            const ribbonIcon = this.addRibbonIcon("arrow-down-01", "Nav Weight: click to disable", () => {
-                const lastStatus = this.sorter.isOn;
-                if (lastStatus) {
-                    this.sorter.needCleanupIcons = true;
-                    // next status is disable
-                    setTooltip(ribbonIcon, "Nav Weight: click to enable");
-                    ribbonIcon.classList.add("nvt-ribbon-disable");
-                } else {
-                    setTooltip(ribbonIcon, "Nav Weight: click to disable");
-                    ribbonIcon.classList.remove("nvt-ribbon-disable");
-                }
-                this.sorter.sortAll();
-                this.sorter.isOn = !lastStatus;
-                this.sorter.sortAll();
+            this.ribbonIcon = this.addRibbonIcon("arrow-down-01", "Nav Weight: click to disable", () => {
+                this.toggleEnable();
+            });
+            this.addCommand({
+                id: "nvt-toggle-enable",
+                name: "Nav Weight: Enable/Disable",
+                callback: this.toggleEnable.bind(this),
             });
             this.addSettingTab(new NaveightSettingTab(this.app, this));
             // ! Step.5: register auto-sort events
@@ -67,6 +61,22 @@ export default class NaveightPlugin extends Plugin {
         // unPatch
         this.sorter.patcher.unPatch();
         // restore original sorting
+        this.sorter.sortAll();
+    }
+
+    toggleEnable() {
+        const lastStatus = this.sorter.isOn;
+        if (lastStatus) {
+            this.sorter.needCleanupIcons = true;
+            // next status is disable
+            setTooltip(this.ribbonIcon, "Nav Weight: click to enable");
+            this.ribbonIcon.classList.add("nvt-ribbon-disable");
+        } else {
+            setTooltip(this.ribbonIcon, "Nav Weight: click to disable");
+            this.ribbonIcon.classList.remove("nvt-ribbon-disable");
+        }
+        this.sorter.sortAll();
+        this.sorter.isOn = !lastStatus;
         this.sorter.sortAll();
     }
 

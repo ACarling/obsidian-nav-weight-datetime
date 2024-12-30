@@ -2,7 +2,7 @@
 
 [[中文](./README_CN.md)]
 
-> A sample plugin designed to sort files in navigation based on markdown frontmatter (also known as metadata) for Obsidian.
+> A simple plugin designed to sort files in navigation based on markdown frontmatter (also known as metadata) for Obsidian.
 
 This plugin sorts files by recognizing the `weight` key defined in the markdown frontmatter, using its value as a criterion for ordering.
 

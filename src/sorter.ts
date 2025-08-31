@@ -273,13 +273,13 @@ export default class Sorter {
         const parsingKeys = this.indexParsingKeys;
         return this.allFeatures
             ? {
-                  weight: frontmatter[parsingKeys.weight],
+                  weight: -new Date(frontmatter[parsingKeys.weight]).getTime(),
                   headless: frontmatter[parsingKeys.headless],
                   empty: frontmatter[parsingKeys.empty],
                   retitled: frontmatter[parsingKeys.retitled],
               }
             : {
-                  weight: frontmatter[parsingKeys.weight],
+                  weight: -new Date(frontmatter[parsingKeys.weight]).getTime(),
               };
     }
 
@@ -287,11 +287,11 @@ export default class Sorter {
         const parsingKeys = this.markdownParsingKeys;
         return this.allFeatures
             ? {
-                  weight: frontmatter[parsingKeys.weight],
+                  weight: -new Date(frontmatter[parsingKeys.weight]).getTime(),
                   headless: frontmatter[parsingKeys.headless],
               }
             : {
-                  weight: frontmatter[parsingKeys.weight],
+                  weight: -new Date(frontmatter[parsingKeys.weight]).getTime(),
               };
     }
 

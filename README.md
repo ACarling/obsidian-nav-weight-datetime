@@ -1,3 +1,9 @@
+# Fork of Nav Weight 
+- parses the "weight" property as a date. Default config uses the "created" property
+
+I am using Obsidian as a CMS for a blog and have a "created" property which I use to sort my articles. I forked this repo to sort my obsidian notes also by date.
+
+
 # Nav Weight
 
 [[中文](./README_CN.md)]

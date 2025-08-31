@@ -2,11 +2,11 @@ import { NvtCfg, NvtSetDesc } from "types/types";
 
 export const DEFAULT_CONFIG: NvtCfg = {
     filename_index: "index",
-    key_sort: "weight",
-    fbk_weight_folder: -20,
-    fbk_weight_index: -10,
+    key_sort: "created",
+    fbk_weight_folder: -20000,
+    fbk_weight_index: -10000,
     fbk_weight_md: 0,
-    fbk_weight_other: 20,
+    fbk_weight_other: 0,
     fbk_retitled: false,
     all_features: false,
 };
